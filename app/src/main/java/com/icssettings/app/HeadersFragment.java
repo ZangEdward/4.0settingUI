@@ -1,6 +1,7 @@
 package com.icssettings.app;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -102,7 +103,13 @@ public class HeadersFragment extends android.app.Fragment implements PrefAdapter
         mItems.add(panelRow(R.drawable.ic_settings_date_time, a.getString(R.string.date_and_time_settings_title), "datetime"));
         mItems.add(panelRow(R.drawable.ic_settings_accessibility, a.getString(R.string.accessibility_settings), "accessibility"));
         mItems.add(panelRow(R.drawable.ic_settings_development, a.getString(R.string.development_settings_title), "developer"));
-        mItems.add(panelRow(R.drawable.ic_settings_about, a.getString(R.string.about_settings), "about"));
+        // About phone is a self-contained, crash-proof fake screen that hosts the
+        // ICS easter egg (the real panel=about path needs system reads that can
+        // fail on modern Android, e.g. 16). Launch AboutActivity directly.
+        PrefItem about = PrefItem.row(R.drawable.ic_settings_about,
+                a.getString(R.string.about_settings), null);
+        about.intent = new Intent(a, AboutActivity.class);
+        mItems.add(about);
     }
 
     private static String statusText(boolean on, String detail) {

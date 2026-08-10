@@ -50,6 +50,14 @@
             android:exported="false"
             android:label="@string/settings_title" />
 
+        <!-- Self-contained fake "About phone" screen: no system reads, hosts the
+             ICS easter egg. Used instead of the system-read-heavy panel=about. -->
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false"
+            android:label="@string/about_settings"
+            android:parentActivityName=".MainActivity" />
+
         <activity
             android:name=".EasterEggActivity"
             android:exported="false"
