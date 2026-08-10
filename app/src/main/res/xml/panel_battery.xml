@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/p_battery">
+        <Preference android:title="@string/p_level" android:summary="@string/v_level" />
+        <Preference android:title="@string/p_status" android:summary="@string/p_charging" />
+        <Preference android:title="@string/p_screen" android:summary="@string/v_screen_pct" />
+        <Preference android:title="@string/p_android_system" android:summary="@string/v_sys_pct" />
+    </PreferenceCategory>
+</PreferenceScreen>

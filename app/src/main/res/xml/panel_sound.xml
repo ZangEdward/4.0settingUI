@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="vibrate"
+        android:title="@string/p_vibrate"
+        android:defaultValue="true" />
+    <PreferenceCategory android:title="@string/p_volumes">
+        <Preference android:title="@string/p_incall_vol" />
+        <Preference android:title="@string/p_media_vol" />
+        <Preference android:title="@string/p_alarm_vol" />
+        <Preference android:title="@string/p_ring_vol" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/p_feedback">
+        <Preference android:title="@string/p_default_ringtone" android:summary="@string/v_ringtone" />
+    </PreferenceCategory>
+</PreferenceScreen>

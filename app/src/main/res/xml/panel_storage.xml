@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/p_internal_storage">
+        <Preference android:title="@string/p_total" android:summary="@string/v_total" />
+        <Preference android:title="@string/p_available" android:summary="@string/v_avail" />
+        <Preference android:title="@string/p_apps" android:summary="@string/v_apps" />
+        <Preference android:title="@string/p_pictures" android:summary="@string/v_pics" />
+        <Preference android:title="@string/p_audio" android:summary="@string/v_audio" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/p_sd_card">
+        <Preference android:title="@string/p_sd_none" />
+    </PreferenceCategory>
+</PreferenceScreen>

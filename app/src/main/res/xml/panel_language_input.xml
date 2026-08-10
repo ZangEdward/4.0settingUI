@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/language_settings">
+        <Preference android:title="@string/v_lang_zh" />
+        <Preference android:title="@string/v_lang_en" />
+        <Preference android:title="@string/v_lang_ja" />
+    </PreferenceCategory>
+    <Preference android:title="@string/p_current_keyboard" android:summary="@string/p_android_keyboard" />
+</PreferenceScreen>

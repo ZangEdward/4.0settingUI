@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreference
+        android:key="bt_on"
+        android:title="@string/bluetooth_settings_title"
+        android:defaultValue="false" />
+    <PreferenceCategory android:title="@string/p_bt_device">
+        <Preference android:title="@string/p_bt_device_name" android:summary="@string/v_device_name" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/p_bt_paired">
+        <Preference android:title="@string/v_car" android:summary="@string/p_bt_paired" />
+        <Preference android:title="@string/v_headset" android:summary="@string/p_bt_paired" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/p_bt_available">
+        <Preference android:title="@string/v_miband" />
+    </PreferenceCategory>
+</PreferenceScreen>

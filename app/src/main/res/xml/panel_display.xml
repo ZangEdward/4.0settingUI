@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreference
+        android:key="auto_bright"
+        android:title="@string/p_auto_bright"
+        android:defaultValue="true" />
+    <Preference android:title="@string/p_brightness" />
+    <Preference android:title="@string/p_wallpaper" />
+    <ListPreference
+        android:key="sleep"
+        android:title="@string/p_sleep"
+        android:entries="@array/sleep_entries"
+        android:entryValues="@array/sleep_values"
+        android:defaultValue="30000" />
+    <ListPreference
+        android:key="font_size"
+        android:title="@string/p_font_size"
+        android:entries="@array/font_entries"
+        android:entryValues="@array/font_values"
+        android:defaultValue="1.0" />
+    <CheckBoxPreference
+        android:key="auto_rotate"
+        android:title="@string/p_auto_rotate"
+        android:defaultValue="true" />
+</PreferenceScreen>

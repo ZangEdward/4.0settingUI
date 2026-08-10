@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="auto_datetime"
+        android:title="@string/p_auto_datetime"
+        android:defaultValue="true" />
+    <CheckBoxPreference
+        android:key="auto_timezone"
+        android:title="@string/p_auto_timezone"
+        android:defaultValue="true" />
+    <CheckBoxPreference
+        android:key="use_24h"
+        android:title="@string/p_24h"
+        android:defaultValue="false" />
+    <Preference android:title="@string/p_set_date" android:summary="@string/v_date" />
+    <Preference android:title="@string/p_set_time" android:summary="@string/v_time" />
+</PreferenceScreen>

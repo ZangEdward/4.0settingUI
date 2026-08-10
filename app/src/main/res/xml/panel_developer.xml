@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="usb_debug"
+        android:title="@string/p_usb_debug"
+        android:defaultValue="false" />
+    <CheckBoxPreference
+        android:key="stay_awake"
+        android:title="@string/p_stay_awake"
+        android:defaultValue="false" />
+    <ListPreference
+        android:key="window_anim"
+        android:title="@string/p_window_anim"
+        android:entries="@array/anim_entries"
+        android:entryValues="@array/anim_values"
+        android:defaultValue="1" />
+    <ListPreference
+        android:key="transition_anim"
+        android:title="@string/p_transition_anim"
+        android:entries="@array/anim_entries"
+        android:entryValues="@array/anim_values"
+        android:defaultValue="1" />
+</PreferenceScreen>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/p_downloaded">
+        <Preference android:title="@string/v_wechat" android:summary="@string/v_apps" />
+        <Preference android:title="@string/v_alipay" android:summary="@string/v_pics" />
+        <Preference android:title="@string/v_thisapp" android:summary="@string/v_audio" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/p_running">
+        <Preference android:title="@string/v_android_sys" android:summary="@string/v_total" />
+        <Preference android:title="@string/v_launcher" android:summary="@string/v_avail" />
+    </PreferenceCategory>
+</PreferenceScreen>

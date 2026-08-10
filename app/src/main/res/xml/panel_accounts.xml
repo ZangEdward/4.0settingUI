@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/p_accounts_cat">
+        <Preference android:title="@string/p_add_account" />
+    </PreferenceCategory>
+    <CheckBoxPreference
+        android:key="bg_data"
+        android:title="@string/p_bg_data"
+        android:defaultValue="true" />
+</PreferenceScreen>

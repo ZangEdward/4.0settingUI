@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="backup_data"
+        android:title="@string/p_backup_data"
+        android:defaultValue="true" />
+    <CheckBoxPreference
+        android:key="auto_restore"
+        android:title="@string/p_auto_restore"
+        android:defaultValue="true" />
+    <Preference android:title="@string/p_factory_reset" android:summary="@string/p_erase_all" />
+</PreferenceScreen>

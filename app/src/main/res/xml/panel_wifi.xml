@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreference
+        android:key="wifi_on"
+        android:title="@string/wifi_settings_title"
+        android:summary="@string/v_nexus5g"
+        android:defaultValue="true" />
+    <PreferenceCategory android:title="@string/p_wifi_networks">
+        <Preference android:title="@string/v_nexus5g" android:summary="@string/p_connected" android:icon="@drawable/ic_wifi_signal_4" />
+        <Preference android:title="@string/v_cmcc" android:icon="@drawable/ic_wifi_lock_signal_3" />
+        <Preference android:title="@string/v_tplink" android:icon="@drawable/ic_wifi_lock_signal_2" />
+        <Preference android:title="@string/v_iphone" android:icon="@drawable/ic_wifi_signal_2" />
+        <Preference android:title="@string/v_xiaomi" android:icon="@drawable/ic_wifi_signal_1" />
+    </PreferenceCategory>
+</PreferenceScreen>

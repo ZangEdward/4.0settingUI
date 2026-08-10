@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/p_phone">
+        <Preference android:title="@string/p_model" android:summary="@string/v_model" />
+        <Preference android:title="@string/p_android_version" android:summary="@string/v_android" />
+        <Preference android:title="@string/p_baseband" android:summary="@string/v_baseband" />
+        <Preference android:title="@string/p_kernel" android:summary="@string/v_kernel" />
+        <Preference android:title="@string/p_build" android:summary="@string/v_build" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/p_status_cat">
+        <Preference android:title="@string/p_battery_level" android:summary="@string/v_level" />
+        <Preference android:title="@string/p_imei" android:summary="@string/v_imei" />
+        <Preference android:title="@string/p_ip" android:summary="@string/v_ip" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/p_legal">
+        <Preference android:title="@string/p_licenses" />
+        <Preference android:title="@string/p_demo_ui" android:summary="@string/v_demo_value" />
+    </PreferenceCategory>
+</PreferenceScreen>

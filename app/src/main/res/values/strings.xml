@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  String resources for the ICS (Android 4.0) Settings replica.
+  Titles for the top-level dashboard are taken verbatim from the AOSP
+  packages/apps/Settings project (android-4.0.4_r2.1).
+-->
+<resources>
+  <string name="app_name">Settings</string>
+  <string name="settings_title">Settings</string>
+
+  <!-- ===== Top-level header categories (AOSP source) ===== -->
+  <string name="header_category_wireless_networks">WIRELESS &amp; NETWORKS</string>
+  <string name="header_category_device">DEVICE</string>
+  <string name="header_category_personal">PERSONAL</string>
+  <string name="header_category_system">SYSTEM</string>
+
+  <!-- ===== Top-level header items (AOSP source) ===== -->
+  <string name="wifi_settings_title">Wi-Fi</string>
+  <string name="bluetooth_settings_title">Bluetooth</string>
+  <string name="data_usage_summary_title">Data usage</string>
+  <string name="radio_controls_title">More…</string>
+  <string name="sound_settings">Sound</string>
+  <string name="display_settings">Display</string>
+  <string name="storage_settings">Storage</string>
+  <string name="power_usage_summary_title">Battery</string>
+  <string name="applications_settings">Apps</string>
+  <string name="sync_settings">Accounts &amp; sync</string>
+  <string name="location_settings_title">Location services</string>
+  <string name="security_settings_title">Security</string>
+  <string name="language_settings">Language &amp; input</string>
+  <string name="privacy_settings">Backup &amp; reset</string>
+  <string name="dock_settings">Dock</string>
+  <string name="date_and_time_settings_title">Date &amp; time</string>
+  <string name="accessibility_settings">Accessibility</string>
+  <string name="development_settings_title">Developer options</string>
+  <string name="about_settings">About phone</string>
+
+  <!-- ===== Wi-Fi panel ===== -->
+  <string name="p_wifi_networks">Wi-Fi networks</string>
+
+  <!-- ===== Bluetooth panel ===== -->
+  <string name="p_bt_device">This device</string>
+  <string name="p_bt_device_name">Device name</string>
+  <string name="p_bt_paired">Paired devices</string>
+  <string name="p_bt_available">Available devices</string>
+
+  <!-- ===== Data usage panel ===== -->
+  <string name="p_mobile_data">Mobile data</string>
+  <string name="p_this_month">This month</string>
+  <string name="p_mobile_usage">Mobile data usage</string>
+  <string name="p_wifi_usage">Wi-Fi usage</string>
+
+  <!-- ===== More (wireless) panel ===== -->
+  <string name="p_airplane">Airplane mode</string>
+  <string name="p_vpn">VPN</string>
+  <string name="p_vpn_none">Not configured</string>
+  <string name="p_mobile_networks">Mobile networks</string>
+  <string name="p_connected">Connected</string>
+
+  <!-- ===== Sound panel ===== -->
+  <string name="p_vibrate">Vibrate</string>
+  <string name="p_volumes">Volumes</string>
+  <string name="p_incall_vol">In-call volume</string>
+  <string name="p_media_vol">Media volume</string>
+  <string name="p_alarm_vol">Alarm volume</string>
+  <string name="p_ring_vol">Ring volume</string>
+  <string name="p_feedback">Feedback</string>
+  <string name="p_default_ringtone">Default notification ringtone</string>
+
+  <!-- ===== Display panel ===== -->
+  <string name="p_auto_bright">Auto brightness</string>
+  <string name="p_brightness">Brightness</string>
+  <string name="p_wallpaper">Wallpaper</string>
+  <string name="p_sleep">Sleep</string>
+  <string name="p_font_size">Font size</string>
+  <string name="p_auto_rotate">Auto-rotate screen</string>
+
+  <!-- ===== Storage panel ===== -->
+  <string name="p_internal_storage">Internal storage</string>
+  <string name="p_total">Total capacity</string>
+  <string name="p_available">Available</string>
+  <string name="p_apps">Apps</string>
+  <string name="p_pictures">Pictures</string>
+  <string name="p_audio">Audio</string>
+  <string name="p_sd_card">SD card</string>
+  <string name="p_sd_none">No SD card installed</string>
+
+  <!-- ===== Battery panel ===== -->
+  <string name="p_battery">Battery</string>
+  <string name="p_level">Level</string>
+  <string name="p_status">Status</string>
+  <string name="p_charging">Charging (USB)</string>
+  <string name="p_screen">Screen</string>
+  <string name="p_android_system">Android system</string>
+
+  <!-- ===== Apps panel ===== -->
+  <string name="p_downloaded">Downloaded</string>
+  <string name="p_running">Running</string>
+
+  <!-- ===== Accounts panel ===== -->
+  <string name="p_accounts_cat">Accounts</string>
+  <string name="p_add_account">Add account</string>
+  <string name="p_bg_data">Background data</string>
+
+  <!-- ===== Location panel ===== -->
+  <string name="p_access_location">Access my location</string>
+  <string name="p_location_mode">Location mode</string>
+  <string name="p_high_acc">High accuracy</string>
+  <string name="p_battery_saving">Battery saving</string>
+  <string name="p_device_only">Device only</string>
+
+  <!-- ===== Security panel ===== -->
+  <string name="p_screen_lock">Screen lock</string>
+  <string name="p_swipe">Swipe</string>
+  <string name="p_owner_info">Owner info</string>
+  <string name="p_none_set">Not set</string>
+  <string name="p_device_admins">Device administrators</string>
+  <string name="p_none">None</string>
+  <string name="p_unknown_sources">Unknown sources</string>
+
+  <!-- ===== Language & input panel ===== -->
+  <string name="p_current_keyboard">Current keyboard</string>
+  <string name="p_android_keyboard">Android Keyboard</string>
+
+  <!-- ===== Backup & reset panel ===== -->
+  <string name="p_backup_data">Back up my data</string>
+  <string name="p_auto_restore">Automatic restore</string>
+  <string name="p_factory_reset">Factory data reset</string>
+  <string name="p_erase_all">Erase all content</string>
+
+  <!-- ===== Dock panel ===== -->
+  <string name="p_auto_dock">Auto-launch desktop dock</string>
+  <string name="p_audio_dock">Audio dock</string>
+
+  <!-- ===== Date & time panel ===== -->
+  <string name="p_auto_datetime">Automatic date &amp; time</string>
+  <string name="p_auto_timezone">Automatic time zone</string>
+  <string name="p_24h">Use 24-hour format</string>
+  <string name="p_set_date">Set date</string>
+  <string name="p_set_time">Set time</string>
+
+  <!-- ===== Accessibility panel ===== -->
+  <string name="p_talkback">TalkBack</string>
+  <string name="p_magnify">Magnification gestures</string>
+  <string name="p_large_text">Large text</string>
+  <string name="p_high_contrast">High contrast text</string>
+  <string name="p_power_end">Power button ends call</string>
+
+  <!-- ===== Developer options panel ===== -->
+  <string name="p_usb_debug">USB debugging</string>
+  <string name="p_stay_awake">Stay awake</string>
+  <string name="p_window_anim">Window animation scale</string>
+  <string name="p_transition_anim">Transition animation scale</string>
+
+  <!-- ===== About phone panel ===== -->
+  <string name="p_phone">Phone</string>
+  <string name="p_model">Model</string>
+  <string name="p_android_version">Android version</string>
+  <string name="p_baseband">Baseband version</string>
+  <string name="p_kernel">Kernel version</string>
+  <string name="p_build">Build number</string>
+  <string name="p_status_cat">Status</string>
+  <string name="p_battery_level">Battery</string>
+  <string name="p_imei">IMEI</string>
+  <string name="p_ip">IP address</string>
+  <string name="p_legal">Legal information</string>
+  <string name="p_licenses">Open source licenses</string>
+  <string name="p_demo_ui">This demo</string>
+
+  <!-- ===== Sample values ===== -->
+  <string name="v_nexus5g">Nexus_5G</string>
+  <string name="v_cmcc">CMCC-8f2a</string>
+  <string name="v_tplink">TP-LINK_家</string>
+  <string name="v_iphone">iPhone 的热点</string>
+  <string name="v_xiaomi">Xiaomi_Guest</string>
+  <string name="v_car">Car kit</string>
+  <string name="v_headset">Bluetooth headset</string>
+  <string name="v_miband">Mi Band 4</string>
+  <string name="v_device_name">Nexus</string>
+  <string name="v_model">Nexus ICS</string>
+  <string name="v_baseband">I9250XXLF1</string>
+  <string name="v_kernel">3.0.31-gd5a28b</string>
+  <string name="v_build">IMM76D</string>
+  <string name="v_android">4.0.4</string>
+  <string name="v_imei">3521xxxxxxxxx</string>
+  <string name="v_ip">192.168.1.20</string>
+  <string name="v_date">Aug 10, 2026</string>
+  <string name="v_time">08:41</string>
+  <string name="v_ringtone">Bean &amp; Sprouts</string>
+  <string name="v_total">8.0 GB</string>
+  <string name="v_avail">2.9 GB</string>
+  <string name="v_apps">2.6 GB</string>
+  <string name="v_pics">1.6 GB</string>
+  <string name="v_audio">0.9 GB</string>
+  <string name="v_mobile_use">1.24 GB</string>
+  <string name="v_wifi_use">8.6 GB</string>
+  <string name="v_screen_pct">38%</string>
+  <string name="v_sys_pct">12%</string>
+  <string name="v_level">82%</string>
+  <string name="v_wechat">WeChat</string>
+  <string name="v_alipay">Alipay</string>
+  <string name="v_thisapp">4.0 Settings</string>
+  <string name="v_android_sys">Android system</string>
+  <string name="v_launcher">Launcher</string>
+  <string name="v_lang_zh">中文 (简体)</string>
+  <string name="v_lang_en">English (United States)</string>
+  <string name="v_lang_ja">日本語</string>
+  <string name="v_demo_value">Replica of Android 4.0 (ICS) Settings</string>
+
+  <!-- ===== ListPreference entries ===== -->
+  <string-array name="sleep_entries">
+    <item>15 seconds</item>
+    <item>30 seconds</item>
+    <item>1 minute</item>
+    <item>2 minutes</item>
+    <item>5 minutes</item>
+    <item>10 minutes</item>
+    <item>30 minutes</item>
+  </string-array>
+  <string-array name="sleep_values">
+    <item>15000</item>
+    <item>30000</item>
+    <item>60000</item>
+    <item>120000</item>
+    <item>300000</item>
+    <item>600000</item>
+    <item>1800000</item>
+  </string-array>
+  <string-array name="font_entries">
+    <item>Small</item>
+    <item>Normal</item>
+    <item>Large</item>
+    <item>Huge</item>
+  </string-array>
+  <string-array name="font_values">
+    <item>0.85</item>
+    <item>1.0</item>
+    <item>1.15</item>
+    <item>1.3</item>
+  </string-array>
+  <string-array name="anim_entries">
+    <item>Animation off</item>
+    <item>0.5x</item>
+    <item>1x</item>
+    <item>1.5x</item>
+    <item>2x</item>
+  </string-array>
+  <string-array name="anim_values">
+    <item>0</item>
+    <item>0.5</item>
+    <item>1</item>
+    <item>1.5</item>
+    <item>2</item>
+  </string-array>
+</resources>

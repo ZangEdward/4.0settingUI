@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreference
+        android:key="mobile_data"
+        android:title="@string/p_mobile_data"
+        android:defaultValue="true" />
+    <PreferenceCategory android:title="@string/p_this_month">
+        <Preference android:title="@string/p_mobile_usage" android:summary="@string/v_mobile_use" />
+        <Preference android:title="@string/p_wifi_usage" android:summary="@string/v_wifi_use" />
+    </PreferenceCategory>
+</PreferenceScreen>

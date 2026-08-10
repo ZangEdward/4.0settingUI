@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference android:title="@string/p_screen_lock" android:summary="@string/p_swipe" />
+    <Preference android:title="@string/p_owner_info" android:summary="@string/p_none_set" />
+    <Preference android:title="@string/p_device_admins" android:summary="@string/p_none" />
+    <CheckBoxPreference
+        android:key="unknown_sources"
+        android:title="@string/p_unknown_sources"
+        android:defaultValue="false" />
+</PreferenceScreen>

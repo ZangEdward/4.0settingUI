@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="access_location"
+        android:title="@string/p_access_location"
+        android:defaultValue="true" />
+    <PreferenceCategory android:title="@string/p_location_mode">
+        <Preference android:title="@string/p_high_acc" />
+        <Preference android:title="@string/p_battery_saving" />
+        <Preference android:title="@string/p_device_only" />
+    </PreferenceCategory>
+</PreferenceScreen>
