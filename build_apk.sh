@@ -1,8 +1,41 @@
 #!/usr/bin/env bash
+# Cross-platform manual APK build (works on local Windows and CI Linux runners).
+# Requires ANDROID_SDK_ROOT and JAVA_HOME. On this machine they are provided by
+# the local tooling env.sh; on GitHub Actions they are supplied by setup-java /
+# android-actions/setup-android.
 set -e
-source "/c/Users/30332/.workbuddy/tooling/env.sh"
 
-APP="C:/Users/30332/WorkBuddy/2026-08-10-08-41-43/4.0settingUI"
+# ---- project root = directory containing this script ----
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+APP="$SCRIPT_DIR"
+# Native Windows tools (aapt2/zipalign/apksigner) need Windows-style paths,
+# not the POSIX form MSYS `pwd` returns. On CI (Linux) cygpath is absent.
+if command -v cygpath >/dev/null 2>&1; then
+  APP="$(cygpath -m "$APP")"
+fi
+
+# ---- toolchain resolution ----
+LOCAL_TOOLING="/c/Users/30332/.workbuddy/tooling"
+if [ -z "$ANDROID_SDK_ROOT" ] && [ -f "$LOCAL_TOOLING/env.sh" ]; then
+  # shellcheck disable=SC1091
+  source "$LOCAL_TOOLING/env.sh"
+fi
+if [ -z "$JAVA_HOME" ] && [ -f "$LOCAL_TOOLING/env.sh" ]; then
+  # shellcheck disable=SC1091
+  source "$LOCAL_TOOLING/env.sh"
+fi
+
+if [ -z "$JAVA_HOME" ] || [ -z "$ANDROID_SDK_ROOT" ]; then
+  echo "ERROR: set JAVA_HOME and ANDROID_SDK_ROOT (or keep local tooling at $LOCAL_TOOLING)."
+  exit 1
+fi
+
+# ---- OS-aware binary extension for native Windows executables ----
+EXT=""
+case "$(uname -s 2>/dev/null)" in
+  MINGW*|MSYS*|CYGWIN*|*_NT-*) EXT=".exe" ;;
+esac
+
 SRC="$APP/app/src/main/java"
 RES="$APP/app/src/main/res"
 MAN="$APP/app/src/main/AndroidManifest.xml"
@@ -16,14 +49,17 @@ RESCMP="$BUILD/res-compiled"
 rm -rf "$BUILD"
 mkdir -p "$GEN" "$CLASSES" "$RESCMP"
 
-AAPT2="$BT/aapt2.exe"
-ZIPALIGN="$BT/zipalign.exe"
+AAPT2="$BT/aapt2$EXT"
+ZIPALIGN="$BT/zipalign$EXT"
 D8_JAR="$BT/lib/d8.jar"
-APKSIGNER="$BT/apksigner.bat"
-KEYTOOL="$JAVA_HOME/bin/keytool.exe"
-JAVAC="$JAVA_HOME/bin/javac"
-JAR="$JAVA_HOME/bin/jar"
-JAVAEXE="$JAVA_HOME/bin/java.exe"
+JAVAC="$JAVA_HOME/bin/javac$EXT"
+JAR="$JAVA_HOME/bin/jar$EXT"
+JAVAEXE="$JAVA_HOME/bin/java$EXT"
+KEYTOOL="$JAVA_HOME/bin/keytool$EXT"
+if [ -f "$BT/apksigner.bat" ]; then APKSIGNER="$BT/apksigner.bat"; else APKSIGNER="$BT/apksigner"; fi
+
+echo "JAVA_HOME=$JAVA_HOME"
+echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
 
 echo "=== [1/6] aapt2 compile resources ==="
 "$AAPT2" compile -o "$RESCMP" --dir "$RES"
