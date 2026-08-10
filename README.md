@@ -15,8 +15,9 @@
 ## 特性
 
 - ✅ **源码级还原**：全部图标（`ic_settings_*`）、顶栏分类与条目标题、字符串均取自 AOSP 4.0.4 源码，**不是手绘近似**。
-- ✅ **原生渲染**：使用框架自带的 `Theme.Holo.Light.DarkActionBar` 与 `Preference`/`PreferenceFragment` 体系，
-  因此能在**所有仍内置 Holo 主题的安卓版本（API 14+，即市面上几乎所有在用的设备）**上原样呈现 4.0 视觉与交互。
+- ✅ **原生渲染**：使用 AOSP Settings 同款的 `Theme.Holo` 与 `Preference`/`PreferenceFragment` 体系，
+  在**所有仍内置 Holo 主题的安卓版本（API 14+，即市面上几乎所有在用的设备）**上原样呈现 4.0 视觉与交互。
+- ✅ **真机验证**：已在原生 Android 4.0.4 x86 平板模拟器上安装运行，深色仪表盘与深色详情页均与系统自带设置一致。
 - ✅ **完整结构**：复刻了 ICS 设置的 4 大分类（无线和网络 / 设备 / 个人 / 系统）与 19 个二级面板
   （Wi-Fi、蓝牙、流量、声音、显示、存储、电池、应用、账户、定位、安全、语言输入、备份重置、基座、日期时间、无障碍、开发者选项、关于手机等）。
 - ✅ **可安装 APK**：已用自签名密钥签名（v1/v2/v3），可直接 `adb install` 安装到手机。
@@ -28,10 +29,21 @@
 | 顶层分类与条目结构 | `res/xml/settings_headers.xml`（AOSP 4.0.4 同名文件，顺序/图标/标题一致） |
 | 图标 | `res/drawable-{mdpi,hdpi,xhdpi}/ic_settings_*.png`（AOSP 官方 PNG，三档密度） |
 | 字符串 | `res/values/strings.xml`、`res/values-zh-rCN/strings.xml`（标题取自源码，示例值本地化） |
-| 主题 | `Theme.Holo.Light.DarkActionBar`（系统框架主题，跨版本一致） |
+| 主题 | `Theme.Holo`（与 AOSP Settings 官方 Manifest 一致，深色仪表盘/详情页） |
 | 框架 | `PreferenceActivity` + `PreferenceFragment` + `preference-headers`（ICS 设置架构） |
 
 源码归档：`https://android.googlesource.com/platform/packages/apps/Settings/+archive/android-4.0.4_r2.1.tar.gz`
+
+## 真机效果对比
+
+左：本项目的 ICS Settings（在 Android 4.0.4 x86 平板模拟器运行）  
+右：同设备的系统原生「设置」应用
+
+| 本项目 `ICS_Settings_4.0.apk` | 系统原生 Settings |
+| --- | --- |
+| ![mine](screenshots/mine.png) | ![real](screenshots/real.png) |
+
+对比可见：深色双栏仪表盘、分类标题、图标样式、Holo 开关/列表均与源码一致。
 
 ## 项目结构
 
