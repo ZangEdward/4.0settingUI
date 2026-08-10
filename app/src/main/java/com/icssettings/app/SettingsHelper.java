@@ -56,15 +56,20 @@ public final class SettingsHelper {
         }
     }
 
-    /** Attempt to toggle Wi-Fi. Returns the resulting enabled state. */
+    /**
+     * Attempt to toggle Wi-Fi. Returns true if the platform accepted the call
+     * (no exception / no security block). The actual state change is delivered
+     * asynchronously via {@link WifiManager#WIFI_STATE_CHANGED_ACTION}, so the
+     * UI should listen for that broadcast rather than re-query immediately.
+     */
     public static boolean setWifiEnabled(Context c, boolean on) {
         try {
             WifiManager w = getWifiManager(c);
             if (w == null) return false;
             w.setWifiEnabled(on);
-            return w.isWifiEnabled();
+            return true;
         } catch (Throwable t) {
-            return isWifiEnabled(c);
+            return false;
         }
     }
 
@@ -131,21 +136,20 @@ public final class SettingsHelper {
         }
     }
 
+    /**
+     * Attempt to toggle Bluetooth. Returns true if the platform accepted the
+     * call. The actual state change is delivered asynchronously via
+     * {@link BluetoothAdapter#ACTION_STATE_CHANGED}.
+     */
     public static boolean setBtEnabled(Context c, boolean on) {
         try {
             BluetoothAdapter a = getBtAdapter(c);
             if (a == null) return false;
-            if (on) {
-                // enable() is restricted on API 31+ for non-system apps.
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) a.enable();
-                else a.enable();
-            } else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) a.disable();
-                else a.disable();
-            }
-            return a.isEnabled();
+            if (on) a.enable();
+            else a.disable();
+            return true;
         } catch (Throwable t) {
-            return isBtEnabled(c);
+            return false;
         }
     }
 
@@ -373,7 +377,7 @@ public final class SettingsHelper {
         try (BufferedReader br = new BufferedReader(new FileReader("/proc/version"))) {
             return br.readLine();
         } catch (IOException t) {
-            return "Unknown";
+            return "—";
         }
     }
 

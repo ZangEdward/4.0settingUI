@@ -251,4 +251,65 @@
     <item>1.5</item>
     <item>2</item>
   </string-array>
+
+  <!-- ===== 彩蛋 ===== -->
+  <string name="egg_title">冰激凌三明治</string>
+  <string name="egg_subtitle">Android 4.0</string>
+  <string name="egg_hint">点击屏幕释放小机器人</string>
+  <string name="egg_toast">点击屏幕释放小机器人</string>
+
+  <!-- ===== 通用状态 ===== -->
+  <string name="state_on">已开启</string>
+  <string name="state_off">已关闭</string>
+  <string name="state_connected">已连接</string>
+  <string name="state_discharging">未充电</string>
+  <string name="state_automatic">自动</string>
+  <string name="state_paired">已配对</string>
+  <string name="state_synced">已同步</string>
+  <string name="state_unknown">未知</string>
+  <string name="state_no_service">无服务</string>
+  <string name="state_secured">已加密</string>
+  <string name="state_open">开放</string>
+
+  <!-- ===== Wi-Fi 面板补充 ===== -->
+  <string name="wifi_is_off">Wi-Fi 已关闭</string>
+  <string name="wifi_turn_on_hint">打开 Wi-Fi 以查看可用网络</string>
+  <string name="wifi_scanning">正在扫描…</string>
+  <string name="wifi_no_networks_yet">尚未找到网络</string>
+  <string name="hidden_network">（隐藏网络）</string>
+  <string name="wifi_add_network">添加网络</string>
+  <string name="wifi_saved_networks">已保存的网络</string>
+  <string name="wifi_advanced">高级</string>
+
+  <!-- ===== 蓝牙面板补充 ===== -->
+  <string name="bt_none_paired">未配对任何设备</string>
+  <string name="bt_search_devices">搜索设备…</string>
+  <string name="bt_rename_device">重命名设备</string>
+  <string name="bt_visibility_timeout">可见性超时</string>
+
+  <!-- ===== 电池面板补充 ===== -->
+  <string name="battery_use">电池使用情况</string>
+
+  <!-- ===== 信号强度 ===== -->
+  <string name="sig_excellent">极好</string>
+  <string name="sig_good">良好</string>
+  <string name="sig_fair">一般</string>
+  <string name="sig_poor">较弱</string>
+
+  <!-- ===== 其它值 ===== -->
+  <string name="font_size_normal">正常</string>
+  <string name="anim_scale_1x">1x</string>
+
+  <!-- ===== 对话框 / Toast ===== -->
+  <string name="dialog_ok">确定</string>
+  <string name="toast_no_activity">没有可启动的界面</string>
+  <string name="toast_easter_egg">冰激凌三明治！</string>
+  <string name="toast_grant_write_settings">请授予“修改系统设置”权限以在此调节亮度</string>
+  <string name="dev_options_enabled">已启用开发者选项（虚拟）</string>
+  <string name="about_tap_remaining">Android %1$s（再点 %2$d 次）</string>
+  <string name="sleep_seconds_fallback">%1$d 秒</string>
+  <string name="about_version_suffix">（ICS 复刻）</string>
+  <string name="about_kernel_suffix">（ICS 复刻）</string>
+  <string name="about_imei_unavailable">不可用</string>
+  <string name="about_ip_none">—</string>
 </resources>

@@ -66,7 +66,7 @@ public class AboutActivity extends Activity implements PrefAdapter.Callback {
                     try {
                         startActivity(item.intent);
                     } catch (Throwable t) {
-                        Toast.makeText(AboutActivity.this, "No activity", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AboutActivity.this, R.string.toast_no_activity, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -85,7 +85,7 @@ public class AboutActivity extends Activity implements PrefAdapter.Callback {
     private void buildItems() {
         mItems.clear();
         mItems.add(PrefItem.category(getString(R.string.p_phone)));
-        mItems.add(PrefItem.row(getString(R.string.p_status_cat), "No service"));
+        mItems.add(PrefItem.row(getString(R.string.p_status_cat), getString(R.string.state_no_service)));
         mItems.add(PrefItem.row(getString(R.string.p_legal), null));
         mItems.add(PrefItem.row(getString(R.string.p_model), safeModel()));
 
@@ -99,8 +99,8 @@ public class AboutActivity extends Activity implements PrefAdapter.Callback {
         };
         mItems.add(ver);
 
-        mItems.add(PrefItem.row(getString(R.string.p_baseband), "Unknown"));
-        mItems.add(PrefItem.row(getString(R.string.p_kernel), "3.0.8-gb55e9a8 (ICS replica)"));
+        mItems.add(PrefItem.row(getString(R.string.p_baseband), getString(R.string.state_unknown)));
+        mItems.add(PrefItem.row(getString(R.string.p_kernel), "3.0.8-gb55e9a8 " + getString(R.string.about_kernel_suffix)));
 
         // Build number — tap 7 times to "enable developer options" (virtual joke).
         PrefItem build = PrefItem.row(getString(R.string.p_build), "IMM76L");
@@ -132,11 +132,11 @@ public class AboutActivity extends Activity implements PrefAdapter.Callback {
             try {
                 startActivity(new Intent(this, EasterEggActivity.class));
             } catch (Throwable t) {
-                Toast.makeText(this, "Ice Cream Sandwich!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.toast_easter_egg, Toast.LENGTH_SHORT).show();
             }
         } else if (mVersionTaps >= 3) {
             Toast.makeText(this,
-                    "Android 4.0.4 (tap " + (7 - mVersionTaps) + " more times)",
+                    getString(R.string.about_tap_remaining, "4.0.4", 7 - mVersionTaps),
                     Toast.LENGTH_SHORT).show();
         }
     }
@@ -145,7 +145,7 @@ public class AboutActivity extends Activity implements PrefAdapter.Callback {
         mBuildTaps++;
         if (mBuildTaps >= 7) {
             mBuildTaps = 0;
-            Toast.makeText(this, "Developer options enabled (virtual)", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.dev_options_enabled, Toast.LENGTH_SHORT).show();
         }
     }
 

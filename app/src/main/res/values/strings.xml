@@ -252,4 +252,65 @@
     <item>1.5</item>
     <item>2</item>
   </string-array>
+
+  <!-- ===== Easter egg ===== -->
+  <string name="egg_title">Ice Cream Sandwich</string>
+  <string name="egg_subtitle">Android 4.0</string>
+  <string name="egg_hint">Tap the screen to release little Androids</string>
+  <string name="egg_toast">Tap the screen to release little Androids</string>
+
+  <!-- ===== Common states ===== -->
+  <string name="state_on">On</string>
+  <string name="state_off">Off</string>
+  <string name="state_connected">Connected</string>
+  <string name="state_discharging">Discharging</string>
+  <string name="state_automatic">Automatic</string>
+  <string name="state_paired">Paired</string>
+  <string name="state_synced">synced</string>
+  <string name="state_unknown">Unknown</string>
+  <string name="state_no_service">No service</string>
+  <string name="state_secured">Secured</string>
+  <string name="state_open">Open</string>
+
+  <!-- ===== Wi-Fi panel extras ===== -->
+  <string name="wifi_is_off">Wi-Fi is turned off</string>
+  <string name="wifi_turn_on_hint">Turn on to see available networks</string>
+  <string name="wifi_scanning">Scanning…</string>
+  <string name="wifi_no_networks_yet">No networks found yet</string>
+  <string name="hidden_network">(hidden network)</string>
+  <string name="wifi_add_network">Add network</string>
+  <string name="wifi_saved_networks">Saved networks</string>
+  <string name="wifi_advanced">Advanced</string>
+
+  <!-- ===== Bluetooth panel extras ===== -->
+  <string name="bt_none_paired">None paired</string>
+  <string name="bt_search_devices">Search for devices…</string>
+  <string name="bt_rename_device">Rename device</string>
+  <string name="bt_visibility_timeout">Visibility timeout</string>
+
+  <!-- ===== Battery panel extras ===== -->
+  <string name="battery_use">Battery use</string>
+
+  <!-- ===== Signal strength ===== -->
+  <string name="sig_excellent">Excellent</string>
+  <string name="sig_good">Good</string>
+  <string name="sig_fair">Fair</string>
+  <string name="sig_poor">Poor</string>
+
+  <!-- ===== Misc values ===== -->
+  <string name="font_size_normal">Normal</string>
+  <string name="anim_scale_1x">1x</string>
+
+  <!-- ===== Dialogs / Toasts ===== -->
+  <string name="dialog_ok">OK</string>
+  <string name="toast_no_activity">No activity</string>
+  <string name="toast_easter_egg">Ice Cream Sandwich!</string>
+  <string name="toast_grant_write_settings">Grant write-settings to adjust brightness here</string>
+  <string name="dev_options_enabled">Developer options enabled (virtual)</string>
+  <string name="about_tap_remaining">Android %1$s (tap %2$d more times)</string>
+  <string name="sleep_seconds_fallback">%1$d seconds</string>
+  <string name="about_version_suffix">(ICS replica)</string>
+  <string name="about_kernel_suffix">(ICS replica)</string>
+  <string name="about_imei_unavailable">Unavailable</string>
+  <string name="about_ip_none">—</string>
 </resources>

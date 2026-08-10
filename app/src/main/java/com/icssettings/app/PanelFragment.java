@@ -1,14 +1,19 @@
 package com.icssettings.app;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.bluetooth.BluetoothAdapter;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -48,6 +53,21 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
     private int mVersionTaps = 0;
     private int mBuildTaps = 0;
 
+    private final BroadcastReceiver mStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context ctx, Intent intent) {
+            String action = intent.getAction();
+            if ("wifi".equals(mKey)
+                    && (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(action)
+                    || WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(action))) {
+                rebuild();
+            } else if ("bluetooth".equals(mKey)
+                    && BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+                rebuild();
+            }
+        }
+    };
+
     public static PanelFragment newInstance(String key) {
         PanelFragment f = new PanelFragment();
         Bundle b = new Bundle();
@@ -65,7 +85,7 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle b) {
-        Context ctx = getActivity();
+        final Context ctx = getActivity();
         if (getActivity() != null) getActivity().setTitle(titleFor(mKey));
         mList = new ListView(ctx);
         mList.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
@@ -85,7 +105,7 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
                     try {
                         startActivity(item.intent);
                     } catch (ActivityNotFoundException e) {
-                        Toast.makeText(getActivity(), "No activity", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), R.string.toast_no_activity, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -96,19 +116,41 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
     @Override
     public void onResume() {
         super.onResume();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if ("wifi".equals(mKey)
-                    && getActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 100);
+        Activity a = getActivity();
+        if (a != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if ("wifi".equals(mKey)
+                        && a.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 100);
+                }
+                if ("about".equals(mKey)
+                        && a.checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, 101);
+                }
             }
-            if ("about".equals(mKey)
-                    && getActivity().checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, 101);
+            IntentFilter f = new IntentFilter();
+            if ("wifi".equals(mKey)) {
+                f.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+                f.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+            } else if ("bluetooth".equals(mKey)) {
+                f.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+            }
+            if (f.countActions() > 0) {
+                a.registerReceiver(mStateReceiver, f);
             }
         }
         rebuild();
+    }
+
+    @Override
+    public void onPause() {
+        Activity a = getActivity();
+        if (a != null) {
+            try { a.unregisterReceiver(mStateReceiver); } catch (Throwable ignored) {}
+        }
+        super.onPause();
     }
 
     private void rebuild() {
@@ -158,57 +200,69 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
     private void buildWifi(Context ctx) {
         boolean on = SettingsHelper.isWifiEnabled(ctx);
         PrefItem sw = PrefItem.switchRow(0, ctx.getString(R.string.wifi_settings_title),
-                on ? "On" : "Off", PrefItem.SWITCH_NONE, on);
+                ctx.getString(on ? R.string.state_on : R.string.state_off),
+                PrefItem.SWITCH_NONE, on);
         sw.key = "wifi_on";
         mItems.add(sw);
 
-        mItems.add(PrefItem.category("Wi-Fi networks"));
+        mItems.add(PrefItem.category(ctx.getString(R.string.p_wifi_networks)));
         String connected = SettingsHelper.getConnectedSsid(ctx);
         List<ScanResult> nets = SettingsHelper.getWifiNetworks(ctx);
         if (!on) {
-            mItems.add(PrefItem.row("Wi-Fi is turned off", "Turn on to see available networks"));
+            mItems.add(PrefItem.row(ctx.getString(R.string.wifi_is_off),
+                    ctx.getString(R.string.wifi_turn_on_hint)));
         } else if (nets.isEmpty()) {
-            mItems.add(PrefItem.row("Scanning…", "No networks found yet"));
+            mItems.add(PrefItem.row(ctx.getString(R.string.wifi_scanning),
+                    ctx.getString(R.string.wifi_no_networks_yet)));
         } else {
             for (ScanResult r : nets) {
                 String ssid = r.SSID;
-                if (ssid == null || ssid.isEmpty()) ssid = "(hidden network)";
-                String sec = (r.capabilities != null && r.capabilities.contains("WPA")) ? "Secured"
-                        : ((r.capabilities != null && r.capabilities.contains("WEP")) ? "Secured" : "Open");
-                String lvl = signalText(r.level);
-                String sum = (ssid.equals(connected) ? "Connected · " : "") + sec + " · " + lvl;
-                mItems.add(PrefItem.row(ssid, sum));
+                if (ssid == null || ssid.isEmpty()) ssid = ctx.getString(R.string.hidden_network);
+                boolean secured = (r.capabilities != null)
+                        && (r.capabilities.contains("WPA") || r.capabilities.contains("WEP")
+                        || r.capabilities.contains("EAP") || r.capabilities.contains("WPS"));
+                int iconRes = signalIconRes(r.level, secured);
+                String lvl = signalText(ctx, r.level);
+                String sec = ctx.getString(secured ? R.string.state_secured : R.string.state_open);
+                StringBuilder sum = new StringBuilder();
+                if (ssid.equals(connected)) {
+                    sum.append(ctx.getString(R.string.state_connected)).append(" · ");
+                }
+                sum.append(sec).append(" · ").append(lvl);
+                mItems.add(PrefItem.row(iconRes, ssid, sum.toString()));
             }
         }
-        mItems.add(PrefItem.row("Add network", null));
-        mItems.add(withIntent(PrefItem.row("Saved networks", null), Settings.ACTION_WIFI_SETTINGS));
-        mItems.add(PrefItem.row("Advanced", null));
+        mItems.add(PrefItem.row(ctx.getString(R.string.wifi_add_network), null));
+        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.wifi_saved_networks), null), Settings.ACTION_WIFI_SETTINGS));
+        mItems.add(PrefItem.row(ctx.getString(R.string.wifi_advanced), null));
     }
 
     private void buildBluetooth(Context ctx) {
         boolean on = SettingsHelper.isBtEnabled(ctx);
         PrefItem sw = PrefItem.switchRow(0, ctx.getString(R.string.bluetooth_settings_title),
-                on ? "On" : "Off", PrefItem.SWITCH_NONE, on);
+                ctx.getString(on ? R.string.state_on : R.string.state_off),
+                PrefItem.SWITCH_NONE, on);
         sw.key = "bt_on";
         mItems.add(sw);
 
         mItems.add(PrefItem.category(ctx.getString(R.string.p_bt_device)));
         String name = SettingsHelper.getBtName(ctx);
         mItems.add(PrefItem.row(ctx.getString(R.string.p_bt_device_name),
-                name != null ? name : "Unknown"));
+                name != null ? name : ctx.getString(R.string.state_unknown)));
 
         mItems.add(PrefItem.category(ctx.getString(R.string.p_bt_paired)));
         List<String> paired = SettingsHelper.getPairedDevices(ctx);
+        String pairedLabel = ctx.getString(R.string.state_paired);
         if (paired.isEmpty()) {
-            mItems.add(PrefItem.row("None paired", null));
+            mItems.add(PrefItem.row(ctx.getString(R.string.bt_none_paired), null));
         } else {
-            for (String d : paired) mItems.add(PrefItem.row(d, "Paired"));
+            for (String d : paired) mItems.add(PrefItem.row(d, pairedLabel));
         }
 
         mItems.add(PrefItem.category(ctx.getString(R.string.p_bt_available)));
-        mItems.add(PrefItem.row("Search for devices…", null));
-        mItems.add(PrefItem.row("Rename device", null));
-        mItems.add(PrefItem.row("Visibility timeout", null));
+        mItems.add(PrefItem.row(ctx.getString(R.string.bt_search_devices), null));
+        mItems.add(PrefItem.row(ctx.getString(R.string.bt_rename_device), null));
+        mItems.add(PrefItem.row(ctx.getString(R.string.bt_visibility_timeout), null));
     }
 
     private void buildDisplay(Context ctx) {
@@ -220,7 +274,7 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
 
         int bri = SettingsHelper.getBrightness(ctx);
         PrefItem brightness = PrefItem.row(ctx.getString(R.string.p_brightness),
-                ab ? "Automatic" : bri + " / 255");
+                ab ? ctx.getString(R.string.state_automatic) : bri + " / 255");
         brightness.action = new Runnable() {
             @Override
             public void run() {
@@ -232,9 +286,9 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
         mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_wallpaper), null),
                 Intent.ACTION_SET_WALLPAPER));
         mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_sleep),
-                sleepText(SettingsHelper.getScreenOffTimeout(ctx))), Settings.ACTION_DISPLAY_SETTINGS));
-        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_font_size), "Normal"),
-                Settings.ACTION_DISPLAY_SETTINGS));
+                sleepText(ctx, SettingsHelper.getScreenOffTimeout(ctx))), Settings.ACTION_DISPLAY_SETTINGS));
+        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_font_size),
+                ctx.getString(R.string.font_size_normal)), Settings.ACTION_DISPLAY_SETTINGS));
 
         boolean rot = SettingsHelper.isAutoRotate(ctx);
         PrefItem rotate = PrefItem.switchRow(0, ctx.getString(R.string.p_auto_rotate), null,
@@ -245,18 +299,18 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
 
     private void buildSound(Context ctx) {
         mItems.add(PrefItem.category(ctx.getString(R.string.p_volumes)));
-        addVolumeRow(ctx, "Ring volume", AudioManager.STREAM_RING);
-        addVolumeRow(ctx, "Media volume", AudioManager.STREAM_MUSIC);
-        addVolumeRow(ctx, "Alarm volume", AudioManager.STREAM_ALARM);
-        addVolumeRow(ctx, "In-call volume", AudioManager.STREAM_VOICE_CALL);
+        addVolumeRow(ctx, ctx.getString(R.string.p_ring_vol), AudioManager.STREAM_RING);
+        addVolumeRow(ctx, ctx.getString(R.string.p_media_vol), AudioManager.STREAM_MUSIC);
+        addVolumeRow(ctx, ctx.getString(R.string.p_alarm_vol), AudioManager.STREAM_ALARM);
+        addVolumeRow(ctx, ctx.getString(R.string.p_incall_vol), AudioManager.STREAM_VOICE_CALL);
 
         mItems.add(PrefItem.category(ctx.getString(R.string.p_feedback)));
         PrefItem vb = PrefItem.switchRow(0, ctx.getString(R.string.p_vibrate), null,
                 PrefItem.SWITCH_NONE, true);
         vb.key = "vibrate";
         mItems.add(vb);
-        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_default_ringtone), "Bean & Sprouts"),
-                Settings.ACTION_SOUND_SETTINGS));
+        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_default_ringtone),
+                ctx.getString(R.string.v_ringtone)), Settings.ACTION_SOUND_SETTINGS));
     }
 
     private void addVolumeRow(Context ctx, String label, final int stream) {
@@ -279,10 +333,11 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
         mItems.add(PrefItem.category(ctx.getString(R.string.p_battery)));
         mItems.add(PrefItem.row(ctx.getString(R.string.p_level), lvl + "%"));
         mItems.add(PrefItem.row(ctx.getString(R.string.p_status),
-                charging ? ctx.getString(R.string.p_charging) : "Discharging"));
+                charging ? ctx.getString(R.string.p_charging) : ctx.getString(R.string.state_discharging)));
         mItems.add(PrefItem.row(ctx.getString(R.string.p_screen), ctx.getString(R.string.v_screen_pct)));
         mItems.add(PrefItem.row(ctx.getString(R.string.p_android_system), ctx.getString(R.string.v_sys_pct)));
-        mItems.add(withIntent(PrefItem.row("Battery use", null), Settings.ACTION_BATTERY_SAVER_SETTINGS));
+        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.battery_use), null),
+                Settings.ACTION_BATTERY_SAVER_SETTINGS));
     }
 
     private void buildStorage(Context ctx) {
@@ -306,7 +361,7 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
         mItems.add(PrefItem.row(ctx.getString(R.string.p_model), Build.MODEL));
 
         PrefItem ver = PrefItem.row(ctx.getString(R.string.p_android_version),
-                Build.VERSION.RELEASE + " (ICS replica)");
+                Build.VERSION.RELEASE + " " + ctx.getString(R.string.about_version_suffix));
         ver.action = new Runnable() {
             @Override
             public void run() {
@@ -315,8 +370,9 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
         };
         mItems.add(ver);
 
-        mItems.add(PrefItem.row(ctx.getString(R.string.p_baseband), safeRadio()));
-        mItems.add(PrefItem.row(ctx.getString(R.string.p_kernel), SettingsHelper.getKernelVersion()));
+        mItems.add(PrefItem.row(ctx.getString(R.string.p_baseband), safeRadio(ctx)));
+        mItems.add(PrefItem.row(ctx.getString(R.string.p_kernel),
+                SettingsHelper.getKernelVersion() + " " + ctx.getString(R.string.about_kernel_suffix)));
         PrefItem build = PrefItem.row(ctx.getString(R.string.p_build), Build.DISPLAY);
         build.action = new Runnable() {
             @Override
@@ -331,9 +387,10 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
         mItems.add(PrefItem.row(ctx.getString(R.string.p_battery_level), lvl + "%"));
         String imei = SettingsHelper.getImei(ctx);
         mItems.add(PrefItem.row(ctx.getString(R.string.p_imei),
-                imei != null ? imei : "Unavailable"));
+                imei != null ? imei : ctx.getString(R.string.about_imei_unavailable)));
         mItems.add(PrefItem.row(ctx.getString(R.string.p_ip),
-                SettingsHelper.getIpAddress() != null ? SettingsHelper.getIpAddress() : "—"));
+                SettingsHelper.getIpAddress() != null ? SettingsHelper.getIpAddress()
+                        : ctx.getString(R.string.about_ip_none)));
 
         mItems.add(PrefItem.category(ctx.getString(R.string.p_legal)));
         mItems.add(PrefItem.row(ctx.getString(R.string.p_licenses), null));
@@ -342,12 +399,12 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
 
     // ---- virtual panels (delegate to real system Settings where sensible) ----
     private void buildDataUsage(Context ctx) {
-        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_mobile_data), "On"),
-                Settings.ACTION_DATA_ROAMING_SETTINGS));
-        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_mobile_usage), ctx.getString(R.string.v_mobile_use)),
-                Settings.ACTION_DATA_USAGE_SETTINGS));
-        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_wifi_usage), ctx.getString(R.string.v_wifi_use)),
-                Settings.ACTION_DATA_USAGE_SETTINGS));
+        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_mobile_data),
+                ctx.getString(R.string.state_on)), Settings.ACTION_DATA_ROAMING_SETTINGS));
+        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_mobile_usage),
+                ctx.getString(R.string.v_mobile_use)), Settings.ACTION_DATA_USAGE_SETTINGS));
+        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_wifi_usage),
+                ctx.getString(R.string.v_wifi_use)), Settings.ACTION_DATA_USAGE_SETTINGS));
     }
 
     private void buildMore(Context ctx) {
@@ -379,11 +436,12 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
 
     private void buildAccounts(Context ctx) {
         mItems.add(PrefItem.category(ctx.getString(R.string.p_accounts_cat)));
-        mItems.add(withIntent(PrefItem.row("Google", "synced"), Settings.ACTION_SYNC_SETTINGS));
+        mItems.add(withIntent(PrefItem.row("Google", ctx.getString(R.string.state_synced)),
+                Settings.ACTION_SYNC_SETTINGS));
         mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_add_account), null),
                 Settings.ACTION_ADD_ACCOUNT));
-        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_bg_data), "On"),
-                Settings.ACTION_SYNC_SETTINGS));
+        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_bg_data),
+                ctx.getString(R.string.state_on)), Settings.ACTION_SYNC_SETTINGS));
     }
 
     private void buildLocation(Context ctx) {
@@ -414,10 +472,10 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
     }
 
     private void buildLanguage(Context ctx) {
-        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_current_keyboard), ctx.getString(R.string.p_android_keyboard)),
-                Settings.ACTION_INPUT_METHOD_SETTINGS));
-        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.language_settings), ctx.getString(R.string.v_lang_zh)),
-                Settings.ACTION_LOCALE_SETTINGS));
+        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_current_keyboard),
+                ctx.getString(R.string.p_android_keyboard)), Settings.ACTION_INPUT_METHOD_SETTINGS));
+        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.language_settings),
+                ctx.getString(R.string.v_lang_zh)), Settings.ACTION_LOCALE_SETTINGS));
     }
 
     private void buildBackup(Context ctx) {
@@ -429,8 +487,8 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
                 PrefItem.SWITCH_NONE, true);
         ar.key = "auto_restore";
         mItems.add(ar);
-        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_factory_reset), ctx.getString(R.string.p_erase_all)),
-                Settings.ACTION_PRIVACY_SETTINGS));
+        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_factory_reset),
+                ctx.getString(R.string.p_erase_all)), Settings.ACTION_PRIVACY_SETTINGS));
     }
 
     private void buildDock(Context ctx) {
@@ -493,9 +551,11 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
                 PrefItem.SWITCH_NONE, false);
         aw.key = "stay_awake";
         mItems.add(aw);
-        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_window_anim), "1x"),
+        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_window_anim),
+                ctx.getString(R.string.anim_scale_1x)),
                 Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS));
-        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_transition_anim), "1x"),
+        mItems.add(withIntent(PrefItem.row(ctx.getString(R.string.p_transition_anim),
+                ctx.getString(R.string.anim_scale_1x)),
                 Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS));
     }
 
@@ -526,7 +586,7 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
             @Override public void onStartTrackingTouch(SeekBar s) {}
             @Override public void onStopTrackingTouch(SeekBar s) {}
         });
-        b.setPositiveButton("OK", null);
+        b.setPositiveButton(R.string.dialog_ok, null);
         b.show();
         rebuild();
     }
@@ -535,8 +595,8 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
         final Context ctx = getActivity();
         if (ctx == null) return;
         if (!SettingsHelper.canWriteSystemSettings(ctx)) {
-            SettingsHelper.requestWriteSettings((android.app.Activity) ctx);
-            Toast.makeText(ctx, "Grant write-settings to adjust brightness here", Toast.LENGTH_LONG).show();
+            SettingsHelper.requestWriteSettings((Activity) ctx);
+            Toast.makeText(ctx, R.string.toast_grant_write_settings, Toast.LENGTH_LONG).show();
             return;
         }
         int bri = SettingsHelper.getBrightness(ctx);
@@ -563,7 +623,7 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
             @Override public void onStartTrackingTouch(SeekBar s) {}
             @Override public void onStopTrackingTouch(SeekBar s) {}
         });
-        b.setPositiveButton("OK", null);
+        b.setPositiveButton(R.string.dialog_ok, null);
         b.show();
         rebuild();
     }
@@ -576,11 +636,12 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
             try {
                 startActivity(new Intent(getActivity(), EasterEggActivity.class));
             } catch (Throwable t) {
-                Toast.makeText(getActivity(), "Easter egg!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.toast_easter_egg, Toast.LENGTH_SHORT).show();
             }
         } else if (mVersionTaps >= 3) {
             Toast.makeText(getActivity(),
-                    "Android " + Build.VERSION.RELEASE + " (" + (7 - mVersionTaps) + " more)",
+                    getString(R.string.about_tap_remaining,
+                            Build.VERSION.RELEASE, 7 - mVersionTaps),
                     Toast.LENGTH_SHORT).show();
         }
     }
@@ -589,7 +650,7 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
         mBuildTaps++;
         if (mBuildTaps >= 7) {
             mBuildTaps = 0;
-            Toast.makeText(getActivity(), "Developer options enabled (virtual)", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.dev_options_enabled, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -601,12 +662,22 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
         String k = item.key;
         if (k == null) { item.checked = checked; return; }
         switch (k) {
-            case "wifi_on":
-                SettingsHelper.setWifiEnabled(ctx, checked);
+            case "wifi_on": {
+                boolean ok = SettingsHelper.setWifiEnabled(ctx, checked);
+                if (!ok) {
+                    SettingsHelper.openSystemSettings((Activity) ctx,
+                            android.provider.Settings.ACTION_WIFI_SETTINGS);
+                }
                 break;
-            case "bt_on":
-                SettingsHelper.setBtEnabled(ctx, checked);
+            }
+            case "bt_on": {
+                boolean ok = SettingsHelper.setBtEnabled(ctx, checked);
+                if (!ok) {
+                    SettingsHelper.openSystemSettings((Activity) ctx,
+                            android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+                }
                 break;
+            }
             case "auto_bright":
                 SettingsHelper.setAutoBrightness(ctx, checked);
                 break;
@@ -641,7 +712,7 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
     // ----------------------------------------------------------- utilities
     private String titleFor(String key) {
         Context ctx = getActivity();
-        if (ctx == null) return "Settings";
+        if (ctx == null) return getString(R.string.settings_title);
         switch (key) {
             case "wifi": return ctx.getString(R.string.wifi_settings_title);
             case "bluetooth": return ctx.getString(R.string.bluetooth_settings_title);
@@ -662,28 +733,51 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
             case "datetime": return ctx.getString(R.string.date_and_time_settings_title);
             case "accessibility": return ctx.getString(R.string.accessibility_settings);
             case "developer": return ctx.getString(R.string.development_settings_title);
-            default: return "Settings";
+            default: return ctx.getString(R.string.settings_title);
         }
     }
 
-    private static String signalText(int level) {
-        if (level >= -50) return "Excellent";
-        if (level >= -60) return "Good";
-        if (level >= -70) return "Fair";
-        return "Poor";
+    private static int signalIndex(int level) {
+        if (level >= -50) return 4;
+        if (level >= -60) return 3;
+        if (level >= -70) return 2;
+        return 1;
     }
 
-    private static String sleepText(int ms) {
-        switch (ms) {
-            case 15000: return "15 seconds";
-            case 30000: return "30 seconds";
-            case 60000: return "1 minute";
-            case 120000: return "2 minutes";
-            case 300000: return "5 minutes";
-            case 600000: return "10 minutes";
-            case 1800000: return "30 minutes";
-            default: return (ms / 1000) + " seconds";
+    private static int signalIconRes(int level, boolean secured) {
+        int idx = signalIndex(level);
+        if (secured) {
+            switch (idx) {
+                case 1: return R.drawable.ic_wifi_lock_signal_1;
+                case 2: return R.drawable.ic_wifi_lock_signal_2;
+                case 3: return R.drawable.ic_wifi_lock_signal_3;
+                default: return R.drawable.ic_wifi_lock_signal_4;
+            }
+        } else {
+            switch (idx) {
+                case 1: return R.drawable.ic_wifi_signal_1;
+                case 2: return R.drawable.ic_wifi_signal_2;
+                case 3: return R.drawable.ic_wifi_signal_3;
+                default: return R.drawable.ic_wifi_signal_4;
+            }
         }
+    }
+
+    private static String signalText(Context ctx, int level) {
+        if (level >= -50) return ctx.getString(R.string.sig_excellent);
+        if (level >= -60) return ctx.getString(R.string.sig_good);
+        if (level >= -70) return ctx.getString(R.string.sig_fair);
+        return ctx.getString(R.string.sig_poor);
+    }
+
+    private static String sleepText(Context ctx, int ms) {
+        String[] values = ctx.getResources().getStringArray(R.array.sleep_values);
+        String[] entries = ctx.getResources().getStringArray(R.array.sleep_entries);
+        String target = String.valueOf(ms);
+        for (int i = 0; i < values.length; i++) {
+            if (target.equals(values[i])) return entries[i];
+        }
+        return ctx.getString(R.string.sleep_seconds_fallback, ms / 1000);
     }
 
     private static String human(long bytes) {
@@ -695,11 +789,11 @@ public class PanelFragment extends Fragment implements PrefAdapter.Callback {
         return String.format("%.1f %s", bytes / Math.pow(1024, i), u[i]);
     }
 
-    private static String safeRadio() {
+    private static String safeRadio(Context ctx) {
         try {
             return Build.getRadioVersion();
         } catch (Throwable t) {
-            return "Unknown";
+            return ctx.getString(R.string.state_unknown);
         }
     }
 }

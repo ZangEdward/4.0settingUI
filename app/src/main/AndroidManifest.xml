@@ -61,6 +61,6 @@
         <activity
             android:name=".EasterEggActivity"
             android:exported="false"
-            android:label="Ice Cream Sandwich" />
+            android:label="@string/egg_title" />
     </application>
 </manifest>

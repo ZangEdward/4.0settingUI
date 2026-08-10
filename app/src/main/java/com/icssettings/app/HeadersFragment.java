@@ -1,8 +1,14 @@
 package com.icssettings.app;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +32,18 @@ public class HeadersFragment extends android.app.Fragment implements PrefAdapter
     private List<PrefItem> mItems;
     private PrefItem mWifiItem;
     private PrefItem mBtItem;
+    private final Handler mRefreshDelayer = new Handler();
+
+    private final BroadcastReceiver mStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context ctx, Intent intent) {
+            String action = intent.getAction();
+            if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(action)
+                    || BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+                refreshSwitches();
+            }
+        }
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle b) {
@@ -54,6 +72,29 @@ public class HeadersFragment extends android.app.Fragment implements PrefAdapter
         return mList;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Activity a = getActivity();
+        if (a != null) {
+            IntentFilter f = new IntentFilter();
+            f.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+            f.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+            a.registerReceiver(mStateReceiver, f);
+        }
+        refreshSwitches();
+    }
+
+    @Override
+    public void onPause() {
+        Activity a = getActivity();
+        if (a != null) {
+            try { a.unregisterReceiver(mStateReceiver); } catch (Throwable ignored) {}
+        }
+        mRefreshDelayer.removeCallbacksAndMessages(null);
+        super.onPause();
+    }
+
     private PrefItem panelRow(int iconRes, String title, String key) {
         PrefItem it = PrefItem.row(iconRes, title, null);
         it.panelKey = key;
@@ -68,7 +109,7 @@ public class HeadersFragment extends android.app.Fragment implements PrefAdapter
         boolean wifiOn = SettingsHelper.isWifiEnabled(a);
         mWifiItem = PrefItem.switchRow(R.drawable.ic_settings_wireless,
                 a.getString(R.string.wifi_settings_title),
-                statusText(wifiOn, SettingsHelper.getConnectedSsid(a)),
+                statusText(a, wifiOn, SettingsHelper.getConnectedSsid(a)),
                 PrefItem.SWITCH_WIFI, wifiOn);
         mWifiItem.panelKey = "wifi";
         mItems.add(mWifiItem);
@@ -76,7 +117,7 @@ public class HeadersFragment extends android.app.Fragment implements PrefAdapter
         boolean btOn = SettingsHelper.isBtEnabled(a);
         mBtItem = PrefItem.switchRow(R.drawable.ic_settings_bluetooth2,
                 a.getString(R.string.bluetooth_settings_title),
-                statusText(btOn, SettingsHelper.getBtName(a)),
+                statusText(a, btOn, SettingsHelper.getBtName(a)),
                 PrefItem.SWITCH_BT, btOn);
         mBtItem.panelKey = "bluetooth";
         mItems.add(mBtItem);
@@ -112,9 +153,12 @@ public class HeadersFragment extends android.app.Fragment implements PrefAdapter
         mItems.add(about);
     }
 
-    private static String statusText(boolean on, String detail) {
-        if (on) return detail != null ? "On · " + detail : "On";
-        return "Off";
+    private static String statusText(Activity a, boolean on, String detail) {
+        if (on) {
+            String prefix = a.getString(R.string.state_on);
+            return detail != null ? prefix + " · " + detail : prefix;
+        }
+        return a.getString(R.string.state_off);
     }
 
     /** Re-read Wi-Fi/Bluetooth state and refresh the two toggle rows. */
@@ -124,10 +168,10 @@ public class HeadersFragment extends android.app.Fragment implements PrefAdapter
         if (a == null) return;
         boolean wifiOn = SettingsHelper.isWifiEnabled(a);
         mWifiItem.checked = wifiOn;
-        mWifiItem.summary = statusText(wifiOn, SettingsHelper.getConnectedSsid(a));
+        mWifiItem.summary = statusText(a, wifiOn, SettingsHelper.getConnectedSsid(a));
         boolean btOn = SettingsHelper.isBtEnabled(a);
         mBtItem.checked = btOn;
-        mBtItem.summary = statusText(btOn, SettingsHelper.getBtName(a));
+        mBtItem.summary = statusText(a, btOn, SettingsHelper.getBtName(a));
         mAdapter.notifyDataSetChanged();
     }
 
@@ -140,19 +184,27 @@ public class HeadersFragment extends android.app.Fragment implements PrefAdapter
     public void onSwitchToggle(PrefItem item, boolean checked) {
         Activity a = getActivity();
         if (a == null) return;
+        boolean accepted;
         if (item.switchKind == PrefItem.SWITCH_WIFI) {
-            boolean ok = SettingsHelper.setWifiEnabled(a, checked);
-            if (ok != checked) {
-                // Platform blocked programmatic toggle (common on Android 16):
-                // send the user to the real Wi-Fi settings to flip it there.
-                SettingsHelper.openSystemSettings(a, android.provider.Settings.ACTION_WIFI_SETTINGS);
-            }
+            accepted = SettingsHelper.setWifiEnabled(a, checked);
         } else if (item.switchKind == PrefItem.SWITCH_BT) {
-            boolean ok = SettingsHelper.setBtEnabled(a, checked);
-            if (ok != checked) {
+            accepted = SettingsHelper.setBtEnabled(a, checked);
+        } else {
+            accepted = true;
+        }
+        if (!accepted) {
+            if (item.switchKind == PrefItem.SWITCH_WIFI) {
+                SettingsHelper.openSystemSettings(a, android.provider.Settings.ACTION_WIFI_SETTINGS);
+            } else if (item.switchKind == PrefItem.SWITCH_BT) {
                 SettingsHelper.openSystemSettings(a, android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
             }
         }
-        refreshSwitches();
+        // The actual state arrives by broadcast; schedule one safety refresh in
+        // case the broadcast is slow or suppressed on this platform.
+        mRefreshDelayer.removeCallbacksAndMessages(null);
+        mRefreshDelayer.postDelayed(new Runnable() {
+            @Override
+            public void run() { refreshSwitches(); }
+        }, 1200);
     }
 }
