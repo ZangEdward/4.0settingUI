@@ -2,7 +2,6 @@ package com.icssettings.app;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.util.Log;
 
 import java.util.List;
 
@@ -34,7 +33,6 @@ public class IcsSettingsActivity extends PreferenceActivity {
         for (Header h : target) {
             if (h.fragment != null) {
                 mInitialHeader = h;
-                Log.i("IcsSettings", "captured initial header: " + h.title + " panel=" + (h.fragmentArguments != null ? h.fragmentArguments.getString("panel") : "null"));
                 break;
             }
         }
@@ -48,7 +46,6 @@ public class IcsSettingsActivity extends PreferenceActivity {
      */
     @Override
     public Header onGetInitialHeader() {
-        Log.i("IcsSettings", "onGetInitialHeader returning " + (mInitialHeader != null ? mInitialHeader.title : "super"));
         return mInitialHeader != null ? mInitialHeader : super.onGetInitialHeader();
     }
 

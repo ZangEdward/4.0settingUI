@@ -61,15 +61,20 @@ cd "$BUILD"
 "$ZIPALIGN" -p 4 "$BUILD/app-unsigned.apk" "$BUILD/app-aligned.apk"
 echo "zipalign done"
 
-echo "=== [6/6] generate keystore + apksigner sign ==="
-KS="$BUILD/ics_settings.keystore"
+echo "=== [6/6] generate keystore (if missing) + apksigner sign ==="
+KS="$APP/ics_settings.keystore"
 ALIAS=icssettings
 STOREPASS="IcsSettings@2026!key"
-"$KEYTOOL" -genkeypair -v \
-  -keystore "$KS" -alias "$ALIAS" \
-  -keyalg RSA -keysize 2048 -validity 10000 \
-  -storepass "$STOREPASS" -keypass "$STOREPASS" \
-  -dname "CN=ICS Settings, OU=ICSSettings, O=ICSSettings, L=Unknown, ST=Unknown, C=CN"
+if [ ! -f "$KS" ]; then
+  "$KEYTOOL" -genkeypair -v \
+    -keystore "$KS" -alias "$ALIAS" \
+    -keyalg RSA -keysize 2048 -validity 10000 \
+    -storepass "$STOREPASS" -keypass "$STOREPASS" \
+    -dname "CN=ICS Settings, OU=ICSSettings, O=ICSSettings, L=Unknown, ST=Unknown, C=CN"
+  echo "generated new keystore: $KS"
+else
+  echo "reusing existing keystore: $KS"
+fi
 "$APKSIGNER" sign --ks "$KS" --ks-key-alias "$ALIAS" \
   --ks-pass "pass:$STOREPASS" --key-pass "pass:$STOREPASS" \
   --out "$APP/ICS_Settings_4.0.apk" "$BUILD/app-aligned.apk"

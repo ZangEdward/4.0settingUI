@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      The real ICS Settings app uses Theme.Holo as its application theme.
+      On some devices the framework resolves Theme.Holo to a light variant for
+      non-system apps, so we explicitly force dark window/background colors
+      while inheriting all other Holo attributes (text colors, action bar, etc.).
+    -->
+    <style name="IcsSettingsTheme" parent="@android:style/Theme.Holo">
+        <item name="android:windowBackground">@android:drawable/screen_background_dark</item>
+        <item name="android:colorBackground">@android:color/black</item>
+        <item name="android:panelColorBackground">@android:color/black</item>
+    </style>
+</resources>
