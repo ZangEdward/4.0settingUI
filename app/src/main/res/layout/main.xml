@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Phone / single-pane: just the dashboard list. -->
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    android:name="com.icssettings.app.HeadersFragment"
+    android:id="@+id/headers_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />

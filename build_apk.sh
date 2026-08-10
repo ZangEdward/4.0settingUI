@@ -39,12 +39,12 @@ FLATS=$(find "$RESCMP" -name '*.flat' -printf '%p ')
 echo "link done; R.java exists: $(test -f "$GEN/com/icssettings/app/R.java" && echo yes)"
 
 echo "=== [3/6] javac compile Java (release 11) ==="
+SRC_FILES=$(find "$SRC" -name '*.java')
 "$JAVAC" --release 11 -encoding UTF-8 \
   -classpath "$ANDROID_JAR" \
   -sourcepath "$SRC;$GEN" \
   -d "$CLASSES" \
-  "$SRC/com/icssettings/app/IcsSettingsActivity.java" \
-  "$SRC/com/icssettings/app/PanelFragment.java" \
+  $SRC_FILES \
   "$GEN/com/icssettings/app/R.java"
 echo "compiled classes: $(find "$CLASSES" -name '*.class' | wc -l)"
 
