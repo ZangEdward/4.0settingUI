@@ -2,6 +2,7 @@ package com.icssettings.app;
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.util.Log;
 
 /**
  * Fragment shown for every dashboard item. It chooses its preference layout
@@ -17,6 +18,7 @@ public class PanelFragment extends PreferenceFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         String panel = getArguments() != null ? getArguments().getString("panel") : "about";
+        Log.i("PanelFragment", "loading panel=" + panel + " args=" + getArguments());
         int res = resolvePanel(panel);
         if (res != 0) {
             addPreferencesFromResource(res);

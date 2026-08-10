@@ -2,6 +2,7 @@ package com.icssettings.app;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.util.Log;
 
 import java.util.List;
 
@@ -16,6 +17,8 @@ import java.util.List;
  */
 public class IcsSettingsActivity extends PreferenceActivity {
 
+    private Header mInitialHeader;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,5 +28,40 @@ public class IcsSettingsActivity extends PreferenceActivity {
     @Override
     public void onBuildHeaders(List<Header> target) {
         loadHeadersFromResource(R.xml.settings_headers, target);
+        // Capture the first header that has a real fragment, so the
+        // multi-pane auto-select (onGetInitialHeader) never targets a
+        // title-only category divider (which would crash with NPE).
+        for (Header h : target) {
+            if (h.fragment != null) {
+                mInitialHeader = h;
+                Log.i("IcsSettings", "captured initial header: " + h.title + " panel=" + (h.fragmentArguments != null ? h.fragmentArguments.getString("panel") : "null"));
+                break;
+            }
+        }
+    }
+
+    /**
+     * On large-screen (multi-pane) devices ICS auto-opens the header returned
+     * here. The dashboard's first header is a title-only category divider with
+     * a null fragment, which would make Fragment.instantiate(null) throw.
+     * Return the first header that actually has a fragment instead.
+     */
+    @Override
+    public Header onGetInitialHeader() {
+        Log.i("IcsSettings", "onGetInitialHeader returning " + (mInitialHeader != null ? mInitialHeader.title : "super"));
+        return mInitialHeader != null ? mInitialHeader : super.onGetInitialHeader();
+    }
+
+    /**
+     * Belt-and-suspenders guard: if the framework somehow tries to switch to a
+     * title-only category header (null fragment), ignore it. Real headers still
+     * call through to the framework.
+     */
+    @Override
+    public void switchToHeader(Header header) {
+        if (header == null || header.fragment == null || header.fragment.length() == 0) {
+            return;
+        }
+        super.switchToHeader(header);
     }
 }
